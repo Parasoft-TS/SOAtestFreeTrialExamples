@@ -5995,6 +5995,185 @@ suite:
               $type: StringTestValue
               value: "${BASEURL}"
   - $type: TestSuite
+    name: "Util: Reset Parabank Database"
+    testID: 83
+    notes: |-
+      Some of the operations performed by the Tests in this Test (.tst) File alter the data of Parabank.  Running this Test Suite will re-initialize the Parabank database back to its starting state.
+
+      Run the Test, select either this Test Suite, or "Test 1: /initializeDB - POST" within, and click the Blue play button on the top toolbar.  You can also use F9 as they keyboard shortcut for running a Test.
+      On the bottom right, you will see the Test Progress view that shows 1/1 Tests Succeeded.
+      On the bottom left, you will see a Quality Tasks view that will show any test failures that arise.
+      On the bottom left, you will see a Console view that will show more test execution details.
+    tests:
+    - $type: RESTClientToolTest
+      name: /initializeDB - POST
+      testID: 84
+      performanceGroup: 16
+      tool:
+        $type: RESTClient
+        iconName: RESTClient
+        name: /initializeDB - POST
+        formJson:
+          value:
+            $type: ElementValue
+            writeType: true
+            hasReference: true
+            qnameAsString: :root
+            replacedColumn: ""
+            values:
+            - $type: ComplexValue
+              replacedColumn: ""
+              attributes:
+              - replacedColumn: ""
+                value:
+                  $type: StringValue
+                  replacedColumn: ""
+                  value: object
+                useValue: true
+              compositorValue: true
+              compositorValueObj:
+                replacedColumn: ""
+                values:
+                  $type: CompositorValueSetCollectionSet
+                  set:
+                  - $type: CompositorValueSet
+          elementTypeName: root
+        hasServiceInfo: true
+        serviceInfo:
+          serviceDescriptor:
+            $type: StandardServiceDescriptor
+            location: https://parabank.parasoft.com/parabank/services/bank/openapi.yaml
+          serviceName: ""
+          versionName: ""
+        jsonBuilder:
+          hasValue: true
+          value:
+            $type: JSONObjectValue
+            nameIsNull: true
+        schemaURL:
+          MessagingClient_SchemaLocation: "${OPENAPI}"
+        formInput:
+          value:
+            $type: ElementValue
+            writeType: true
+            hasReference: true
+            qnameAsString: ":"
+            replacedColumn: ""
+            values:
+            - $type: ComplexValue
+              replacedColumn: ""
+              compositorValue: true
+              compositorValueObj:
+                replacedColumn: ""
+                values:
+                  $type: CompositorValueSetCollectionSet
+                  set:
+                  - $type: CompositorValueSet
+        jmsMessageOutputProvider:
+          $type: JMSMessageOutputProvider
+          jmsOutputProviderRequest:
+            $type: JMSOutputProvider
+            name: Request Object
+            menuName: Object
+          jmsOutputProviderResponse:
+            $type: JMSOutputProvider
+            name: Response Message Object
+            menuName: Message Object
+        validResponseRange:
+          validResponseRange:
+            values:
+            - $type: ScriptedValue
+            fixedValue:
+              $type: StringTestValue
+              validResponseRange: 204
+        router:
+          values:
+          - $type: ScriptedValue
+          fixedValue:
+            $type: StringTestValue
+            HTTPClient_Endpoint: "${BASEURL}/initializeDB"
+        transportProperties:
+          manager:
+            protocol: 1
+            properties:
+            - $type: HTTPClientHTTPProperties
+              followRedirects:
+                bool: true
+              common:
+                method:
+                  values:
+                  - $type: ScriptedValue
+                  fixedValue:
+                    $type: HTTPMethodTestValue
+                    method: POST
+                httpHeaders:
+                  properties:
+                  - name: Accept
+                    value:
+                      values:
+                      - $type: ScriptedValue
+                      fixedValue:
+                        $type: StringTestValue
+                        value: application/json
+              protocol: 1
+              keepAlive1_1:
+                bool: true
+          messageExchangePattern:
+            inverted: true
+        outputProviders:
+          requestHeader:
+            $type: HTTPNamedToolOutputProvider
+            menuName: Transport Header
+            name: Request Transport Header
+          responseHeader:
+            $type: HTTPNamedToolOutputProvider
+            menuName: Transport Header
+            name: Response Transport Header
+          xmlRequestOutput:
+            $type: NamedXMLToolOutputProvider
+            menuName: Traffic
+            name: Request Traffic
+          trafficOutput:
+            m_name: Traffic Stream
+          objectOutput:
+            $type: ObjectOutputProvider
+            outputTools:
+            - $type: TrafficViewer
+              iconName: TrafficViewer
+              name: Traffic Viewer
+              showRequestHeaders: true
+              showResponseHeaders: true
+            name: Traffic Object
+        formXML:
+          doctype: ""
+        literal:
+          use: 1
+          text:
+            MessagingClient_LiteralMessage: ""
+            type: application/json
+        mode: Literal
+        literalQuery:
+          isPropertiesRef: true
+        literalPath:
+          pathElements:
+          - values:
+            - $type: ScriptedValue
+            fixedValue:
+              $type: StringTestValue
+              value: initializeDB
+        resourceMethod:
+          resourceId: /initializeDB
+          httpMethod: POST
+        resourceMode: 3
+        baseUrl:
+          values:
+          - $type: ScriptedValue
+          - $type: WadlTestValue
+            value: https://parabank.parasoft.com/parabank/services/bank
+          fixedValue:
+            $type: StringTestValue
+            value: "${BASEURL}"
+  - $type: TestSuite
     name: 1.0.1 - Basic REST Client (GET)
     testID: 56
     notes: |-
@@ -6005,16 +6184,14 @@ suite:
       REST Client Tabs > HTTP Options: This tab is where you can configure additional settings like Authentication or custom HTTP Headers.  We'll come back to Authentication further down in this Test (.tst) File.
       REST Client Tabs > Misc: Here are some miscellaneous settings, including the default response validation for Valid HTTP Response Codes.  You can change this setting to see the Test fail when you run it.
 
-      To run the Test, select either this Test Suite, or Test 1 within, and click the Blue play button on the top toolbar.  You can also use F9 as they keyboard shortcut for running a Test.
-
-      After the Test runs, expand the Test node and double-click the Traffic Viewer Tool that is chained to the REST Client's Traffic Object output.  This is where you can see the Request/Response details of the test run.
+      Run the Test.  After the Test runs, expand the Test node and double-click the Traffic Viewer Tool that is chained to the REST Client's Traffic Object output.  This is where you can see the Request/Response details of the test run.
 
       SOAtest Tests are based on the concept of Tools.  The REST Client is a Tool, and the Traffic Viewer is a Tool.  Some Tools are meant to be standalone (i.e., Tests in a Test Suite) and other Tools are meant to be chained to a standalone Tool's output.
       * To see the list of standalone tools, right click this Test Suite > Add New > Test.  Review the list of available standalone Tools that can be added to a SOAtest Test (.tst) File.
-      * To see the list of chainable tools for a REST Client, right click the REST Client "Test 1: /accounts/{accountId} - GET" > Add Output.  You will notice that the REST Client has a number of outputs grouped into Request, Response, and Both.  Most of the time, you will be chaining Tools to a REST Client's Response Transport Header or Response Traffic output.  We will cover the most common Tools that get chained to a REST Client further down in this Test (.tst) File.
+      * To see the list of chainable tools for a REST Client, right click the REST Client "Test 1: /accounts/{accountId} - GET" > Add Output.  You will notice that the REST Client has a number of outputs grouped into Response, Request, and Both.  Most of the time, you will be chaining Tools to a REST Client's Response Transport Header or Response Traffic output.  We will cover the most common Tools that get chained to a REST Client further down in this Test (.tst) File.
 
       Troubleshooting:
-      * If a Test fails with a response like "Could not find account #12345": Go to http://parabank.parasoft.com/ in a web browser, click the Admin Page link, click the Database Initialize button, then try again.
+      * If a Test fails with a response like "Could not find account #12345": Go to http://parabank.parasoft.com/ in a web browser, click the Admin Page link, click the Database > Initialize button, then try again.
       * If a Test fails with no response, check that you have network access to the public site http://parabank.parasoft.com.
     tests:
     - $type: RESTClientToolTest
@@ -7161,7 +7338,7 @@ suite:
       2. Right click the Test > Create Regression Control > Create Internal Regression Control.  This will run the REST Client, copy the live response, and setup the Diff Tool for regression based on the live response.
 
       Troubleshooting:
-      * If the Test initially fails with unexpected differences: Go to http://parabank.parasoft.com/ in a web browser, click the Admin Page link, click the Database Initialize button, then try again.
+      * If the Test initially fails with unexpected differences: Go to http://parabank.parasoft.com/ in a web browser, click the Admin Page link, click the Database > Initialize button, then try again.
     tests:
     - $type: RESTClientToolTest
       name: "/accounts/{accountId} - GET"
@@ -7392,7 +7569,7 @@ suite:
 
       Troubleshooting:
       * If you don't see the tree view populated when adding a new assertion, run the test first and then try adding the assertion again.
-      * If the Test initially fails with assertion failures: Go to http://parabank.parasoft.com/ in a web browser, click the Admin Page link, click the Database Initialize button, then try again.
+      * If the Test initially fails with assertion failures: Go to http://parabank.parasoft.com/ in a web browser, click the Admin Page link, click the Database > Initialize button, then try again.
     tests:
     - $type: RESTClientToolTest
       name: "/customers/{customerId}/accounts - GET"
@@ -7643,15 +7820,17 @@ suite:
     name: 1.1.3 - Basic REST Client - With Validation - Validator
     testID: 63
     notes: |-
-      Here, you'll notice the same REST Client like the previous examples, except there is a new Tool chained to it's Response Traffic output, a JSON Validator Tool.
+      Here, you'll notice Test 1 is the same REST Client like the previous examples, except there is a new Tool chained to it's Response Traffic output, a JSON Validator Tool.
 
       A JSON (and XML) Validator Tool does contract validation on the API response to make sure it:
       a) Is well-formed JSON (or XML)
-      b) Conforms to the schema defined by the OpenAPI service definition
+      b) Conforms to the schema defined by the service definition
 
       Validator Tools are ideal to include with your API tests to make sure that the API contract is always in sync with the behavior of the API.  This can help catch integration issues early, before more robust API consumer-side testing takes place.
 
-      When you run this Test, it will pass.  You can experiment by opening the Validaor Tool and changing the schema to a different resource just to see what an failure message might look like.
+      When you run Test 1, it will pass.  You can experiment by opening the Validaor Tool and changing the schema to a different resource just to see what a failure message might look like.
+
+      You'll also see Test 2, a standalone Tool called the OpenAPI/Swagger Validator.  This is a simple Tool that checks your OpenAPI or Swagger service definition against the OpenAPI/Swagger spec itself, to catch any fundamental issues with your service definition.  While the JSON Validator is checking your API responses to make sure they conform to your service definition, this Tool is checking that there are no issues with your service definition itself.
     tests:
     - $type: RESTClientToolTest
       name: "/accounts/{accountId} - GET"
@@ -7844,6 +8023,16 @@ suite:
           fixedValue:
             $type: StringTestValue
             value: "${BASEURL}"
+    - $type: ToolTest
+      name: OpenAPI/Swagger Validator
+      testID: 86
+      tool:
+        $type: SwaggerValidator
+        iconName: SwaggerValidator
+        name: OpenAPI/Swagger Validator
+        definitionUrl: "${OPENAPI}"
+        errorsOutput:
+          name: Errors
   - $type: TestSuite
     name: 1.2.1 - Data Driven REST Client
     testID: 65
@@ -8070,7 +8259,7 @@ suite:
       2) Right click the Test > Create Regression Control > Create Multiple Controls > Create Internal Regression Controls.  The feature is aware that the test is data-driven with a Data Source.  This will loop running the REST Client for each Data Source row, copy the live response for each row, and setup the Diff Tool for with Multiple regression controls based on each live response that was received.
 
       Troubleshooting:
-      * If the Test initially fails with unexpected differences: Go to http://parabank.parasoft.com/ in a web browser, click the Admin Page link, click the Database Initialize button, then try again.
+      * If the Test initially fails with unexpected differences: Go to http://parabank.parasoft.com/ in a web browser, click the Admin Page link, click the Database > Initialize button, then try again.
     dataSources:
     - id: ds_1275906716_1763150821706_621798800
       impl:
@@ -8288,7 +8477,7 @@ suite:
       You can experiment with changing the data to see what a failure would look like.
 
       Troubleshooting:
-      * If the Test initially fails with unexpected assertion failures: Go to http://parabank.parasoft.com/ in a web browser, click the Admin Page link, click the Database Initialize button, then try again.
+      * If the Test initially fails with unexpected assertion failures: Go to http://parabank.parasoft.com/ in a web browser, click the Admin Page link, click the Database > Initialize button, then try again.
     dataSources:
     - id: ds_1275906716_1763150821706_621798800
       impl:
@@ -8531,15 +8720,15 @@ suite:
             $type: StringTestValue
             value: "${BASEURL}"
   - $type: TestSuite
-    name: "Util: Reset Parabank Database"
-    testID: 79
+    name: "Util: Reset Parabank Database 2"
+    testID: 81
     notes: Some of the operations performed by the Tests in this Test (.tst) File
       alter the data of Parabank.  Running this Test Suite will re-initialize the
       Parabank database back to its starting state.
     tests:
     - $type: RESTClientToolTest
       name: /initializeDB - POST
-      testID: 80
+      testID: 82
       performanceGroup: 16
       tool:
         $type: RESTClient

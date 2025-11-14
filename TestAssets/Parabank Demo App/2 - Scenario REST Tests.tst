@@ -6011,7 +6011,7 @@ suite:
       Select the Scenario node and run the Tests.  You can see for yourself by checking the Traffic Viewers chained to Tests 1 & 2 that the customerId field from the response of Test 1 was used in the request of Test 2.  Furthermore, you can use the following alternate login credentials to see that a different customerId is returned and used in Test 2: parasoft/demo
 
       Troubleshooting:
-      * If a Test fails with a response like "Could not login": Go to http://parabank.parasoft.com/ in a web browser, click the Admin Page link, click the Database Initialize button, then try again.
+      * If a Test fails with a response like "Could not login": Go to http://parabank.parasoft.com/ in a web browser, click the Admin Page link, click the Database > Initialize button, then try again.
       * If a Test fails with no response, check that you have network access to the public site http://parabank.parasoft.com.
     tests:
     - $type: RESTClientToolTest
@@ -6890,8 +6890,7 @@ suite:
             xmlMessage: true
             virtualDSCreator:
               writableColumns:
-              - match: ""
-                customName: "Test 1: balance[1]"
+              - customName: "Test 1: balance[1]"
           conversionStrategy:
             dataFormatName: JSON
             conversionStrategyId: JSON
@@ -8251,6 +8250,515 @@ suite:
           fixedValue:
             $type: StringTestValue
             value: "${BASEURL}"
+  - $type: TestSuite
+    name: 2.2.1 - Iterate Over Response List - With Validation - Assertor
+    testID: 77
+    notes: |-
+      Here is an example of an advanced scenario that extracts a list from one API response, and then iterates over the data from that list in a subsequent API call that's looping over a dynamically generated Data Source.
+
+      First, open the Writable Data Source in this Scenario.  This is a special kind of Data Source that is meant to be populated at runtime with 1-n rows of data, with the intent that subsequent Tests will be parameterized to these columns for looping.
+
+      Notice Test 1 is the same REST Client from the 1.1.2 example.  The API response is a list of accounts associated with a particular customerId.
+
+      Notice the JSON Data Bank chained to Test 1.  There are two differences with how the extractions in this JSON Data Bank are configured compared to previous examples you've seen.
+      1) Each Extraction is adding an XPath for all occurences of an element, not just the first occurence.  Right-click on a node in the Tree view to see the option that was used to make the extraction.  Inspecting the existing extractions will also show you the XPath that is selecting multiple nodes, which can be Evaluated in the same window.
+      2) Each Extraction is configured to populate a column in the Writable Data Source, rather than storing the data in a Custom Column Name.
+
+      Next, open the nested Scenario "Dynamically Loop Accounts".  For the looping to work as intended, the Execution Options were modified so that Tests would run as a group.
+
+      Finally, open the REST Client and its chained JSON Assertor within the nested looping Scenario.  Notice both are configured to iterate over the Writable Data Source's columns.
+
+      Select Scenario 2.2.1 and run the Scenario.  Notice that 12 Tests are executed, one for retrieving the customer's account, and eleven because there are fifteen accounts associated with this customerId.
+      The Traffic Viewer chained to the REST Client within the nested looping Scenario shows the Request/Response traffic for each row of the Writable Data Source.
+    dataSources:
+    - id: ds_1986284823_1763162604303_1729567509
+      impl:
+        $type: WritableDataSource
+        model:
+          columnCount: 2
+          columnIdentifiers:
+          - accountId
+          - accountBalance
+          rows:
+          - - 12345
+            - -2300.00
+          - - 12456
+            - 10.45
+          - - 12567
+            - 100.00
+          - - 12678
+            - -100.00
+          - - 12789
+            - 100.00
+          - - 12900
+            - 0.00
+          - - 13011
+            - 100.00
+          - - 13122
+            - 1100.00
+          - - 13233
+            - 100.00
+          - - 13344
+            - 1231.10
+          - - 54321
+            - 1351.12
+        resetMode: 2
+        writingMode: 3
+      name: Dynamic Data 2-2-1
+      useAllRows: true
+    tests:
+    - $type: RESTClientToolTest
+      name: "/customers/{customerId}/accounts - GET"
+      testID: 78
+      performanceGroup: 11
+      tool:
+        $type: RESTClient
+        dataSourceNames:
+        - Dynamic Data 2-2-1
+        iconName: RESTClient
+        name: "/customers/{customerId}/accounts - GET"
+        outputTools:
+        - $type: GenericDataBank
+          dataSourceNames:
+          - Dynamic Data 2-2-1
+          iconName: XMLDataBank
+          name: JSON Data Bank
+          wrappedTool:
+            $type: XMLtoDataSource
+            dataSourceNames:
+            - Dynamic Data 2-2-1
+            iconName: XMLDataBank
+            name: XML Data Bank
+            selectedXPaths:
+            - elementOption: 1
+              contentOption: 1
+              XMLDataBank_ExtractXPath: "/root/item/id[1]/text()"
+              mode: 1
+            - elementOption: 1
+              contentOption: 1
+              XMLDataBank_ExtractXPath: "/root/item/balance[1]/text()"
+              mode: 1
+            canonicalizeOutput: true
+            xmlMessage: true
+            virtualDSCreator:
+              writableColumns:
+              - dataSourceNames:
+                - "Dynamic Data 2-2-1: accountId"
+                mode: 2
+                customName: "Test 1: id"
+              - dataSourceNames:
+                - "Dynamic Data 2-2-1: accountBalance"
+                mode: 2
+                customName: "Test 1: balance"
+          conversionStrategy:
+            dataFormatName: JSON
+            conversionStrategyId: JSON
+            conversionStrategyClassName: com.parasoft.xml.convert.json.JsonConversionStrategy
+        formJson:
+          value:
+            $type: ElementValue
+            writeType: true
+            hasReference: true
+            qnameAsString: :root
+            replacedColumn: ""
+            values:
+            - $type: ComplexValue
+              replacedColumn: ""
+              attributes:
+              - replacedColumn: ""
+                value:
+                  $type: StringValue
+                  replacedColumn: ""
+                  value: object
+                useValue: true
+              compositorValue: true
+              compositorValueObj:
+                replacedColumn: ""
+                values:
+                  $type: CompositorValueSetCollectionSet
+                  set:
+                  - $type: CompositorValueSet
+          elementTypeName: root
+        hasServiceInfo: true
+        serviceInfo:
+          serviceDescriptor:
+            $type: StandardServiceDescriptor
+            location: https://parabank.parasoft.com/parabank/services/bank/openapi.yaml
+          serviceName: ""
+          versionName: ""
+        jsonBuilder:
+          hasValue: true
+          value:
+            $type: JSONObjectValue
+            nameIsNull: true
+        schemaURL:
+          MessagingClient_SchemaLocation: "${OPENAPI}"
+        formInput:
+          value:
+            $type: ElementValue
+            writeType: true
+            hasReference: true
+            qnameAsString: ":"
+            replacedColumn: ""
+            values:
+            - $type: ComplexValue
+              replacedColumn: ""
+              compositorValue: true
+              compositorValueObj:
+                replacedColumn: ""
+                values:
+                  $type: CompositorValueSetCollectionSet
+                  set:
+                  - $type: CompositorValueSet
+        jmsMessageOutputProvider:
+          $type: JMSMessageOutputProvider
+          jmsOutputProviderRequest:
+            $type: JMSOutputProvider
+            name: Request Object
+            menuName: Object
+          jmsOutputProviderResponse:
+            $type: JMSOutputProvider
+            name: Response Message Object
+            menuName: Message Object
+        validResponseRange:
+          validResponseRange:
+            values:
+            - $type: ScriptedValue
+            fixedValue:
+              $type: StringTestValue
+              validResponseRange: 200
+        router:
+          values:
+          - $type: ScriptedValue
+          fixedValue:
+            $type: StringTestValue
+            HTTPClient_Endpoint: "${BASEURL}/customers/{customerId}/accounts"
+        transportProperties:
+          manager:
+            protocol: 1
+            properties:
+            - $type: HTTPClientHTTPProperties
+              followRedirects:
+                bool: true
+              common:
+                method:
+                  values:
+                  - $type: ScriptedValue
+                  fixedValue:
+                    $type: HTTPMethodTestValue
+                    method: GET
+                httpHeaders:
+                  properties:
+                  - name: Accept
+                    value:
+                      values:
+                      - $type: ScriptedValue
+                      fixedValue:
+                        $type: StringTestValue
+                        value: application/json
+              protocol: 1
+              keepAlive1_1:
+                bool: true
+          messageExchangePattern:
+            inverted: true
+        outputProviders:
+          requestHeader:
+            $type: HTTPNamedToolOutputProvider
+            menuName: Transport Header
+            name: Request Transport Header
+          responseHeader:
+            $type: HTTPNamedToolOutputProvider
+            menuName: Transport Header
+            name: Response Transport Header
+          xmlRequestOutput:
+            $type: NamedXMLToolOutputProvider
+            menuName: Traffic
+            name: Request Traffic
+          trafficOutput:
+            m_name: Traffic Stream
+          objectOutput:
+            $type: ObjectOutputProvider
+            outputTools:
+            - $type: TrafficViewer
+              iconName: TrafficViewer
+              name: Traffic Viewer
+              showRequestHeaders: true
+            name: Traffic Object
+        formXML:
+          doctype: ""
+        literal:
+          use: 1
+          text:
+            MessagingClient_LiteralMessage: ""
+            type: application/json
+        mode: Literal
+        literalQuery:
+          isPropertiesRef: true
+        literalPath:
+          pathElements:
+          - values:
+            - $type: ScriptedValue
+            fixedValue:
+              $type: StringTestValue
+              value: customers
+          - values:
+            - $type: ScriptedValue
+            fixedValue:
+              $type: StringTestValue
+              value: "{customerId}"
+          - values:
+            - $type: ScriptedValue
+            fixedValue:
+              $type: StringTestValue
+              value: accounts
+        constrainedPath:
+          pathParameters:
+          - $type: ElementValue
+            writeType: true
+            hasReference: true
+            qnameAsString: :customerId
+            replacedColumn: ""
+            values:
+            - $type: IntegerValue
+              replacedColumn: ""
+              value: 12212
+        resourceMethod:
+          resourceId: "/customers/{customerId}/accounts"
+          httpMethod: GET
+        resourceMode: 3
+        baseUrl:
+          values:
+          - $type: ScriptedValue
+          - $type: WadlTestValue
+            value: https://parabank.parasoft.com/parabank/services/bank
+          fixedValue:
+            $type: StringTestValue
+            value: "${BASEURL}"
+    - $type: TestSuite
+      name: Dynamically Loop Accounts
+      testID: 79
+      runMode: 1
+      tests:
+      - $type: RESTClientToolTest
+        name: "/accounts/{accountId} - GET"
+        testID: 80
+        performanceGroup: 0
+        tool:
+          $type: RESTClient
+          dataSourceNames:
+          - Dynamic Data 2-2-1
+          iconName: RESTClient
+          name: "/accounts/{accountId} - GET"
+          outputTools:
+          - $type: GenericAssertionTool
+            dataSourceNames:
+            - Dynamic Data 2-2-1
+            iconName: XMLAssertor
+            name: JSON Assertor
+            wrappedTool:
+              $type: XMLAssertionTool
+              dataSourceNames:
+              - Dynamic Data 2-2-1
+              iconName: XMLAssertor
+              name: XML Assertor
+              assertions:
+              - $type: NumericAssertion
+                timestamp: 1763162791730
+                name: Numeric Assertion
+                Assertion_XPath: /root/balance
+                value:
+                  name: Numeric
+                  value:
+                    fixedValue:
+                      $type: StringTestValue
+                    parameterizedValue:
+                      column: "Dynamic Data 2-2-1: accountBalance"
+                    selectedIndex: -2
+              message:
+                $type: ExpectedXMLMessage
+                message: true
+            conversionStrategy:
+              dataFormatName: JSON
+              conversionStrategyId: JSON
+              conversionStrategyClassName: com.parasoft.xml.convert.json.JsonConversionStrategy
+          formJson:
+            value:
+              $type: ElementValue
+              writeType: true
+              hasReference: true
+              qnameAsString: :root
+              replacedColumn: ""
+              values:
+              - $type: ComplexValue
+                replacedColumn: ""
+                attributes:
+                - replacedColumn: ""
+                  value:
+                    $type: StringValue
+                    replacedColumn: ""
+                    value: object
+                  useValue: true
+                compositorValue: true
+                compositorValueObj:
+                  replacedColumn: ""
+                  values:
+                    $type: CompositorValueSetCollectionSet
+                    set:
+                    - $type: CompositorValueSet
+            elementTypeName: root
+          hasServiceInfo: true
+          serviceInfo:
+            serviceDescriptor:
+              $type: StandardServiceDescriptor
+              location: https://parabank.parasoft.com/parabank/services/bank/openapi.yaml
+          jsonBuilder:
+            hasValue: true
+            value:
+              $type: JSONObjectValue
+              nameIsNull: true
+          schemaURL:
+            MessagingClient_SchemaLocation: "${OPENAPI}"
+          formInput:
+            value:
+              $type: ElementValue
+              writeType: true
+              hasReference: true
+              qnameAsString: ":"
+              replacedColumn: ""
+              values:
+              - $type: ComplexValue
+                replacedColumn: ""
+                compositorValue: true
+                compositorValueObj:
+                  replacedColumn: ""
+                  values:
+                    $type: CompositorValueSetCollectionSet
+                    set:
+                    - $type: CompositorValueSet
+          jmsMessageOutputProvider:
+            $type: JMSMessageOutputProvider
+            jmsOutputProviderRequest:
+              $type: JMSOutputProvider
+              name: Request Object
+              menuName: Object
+            jmsOutputProviderResponse:
+              $type: JMSOutputProvider
+              name: Response Message Object
+              menuName: Message Object
+          validResponseRange:
+            validResponseRange:
+              values:
+              - $type: ScriptedValue
+              fixedValue:
+                $type: StringTestValue
+                validResponseRange: 200
+          router:
+            values:
+            - $type: ScriptedValue
+            fixedValue:
+              $type: StringTestValue
+              HTTPClient_Endpoint: "${BASEURL}/accounts/{accountId}"
+          transportProperties:
+            manager:
+              protocol: 1
+              properties:
+              - $type: HTTPClientHTTPProperties
+                followRedirects:
+                  bool: true
+                common:
+                  method:
+                    values:
+                    - $type: ScriptedValue
+                    fixedValue:
+                      $type: HTTPMethodTestValue
+                      method: GET
+                  httpHeaders:
+                    properties:
+                    - name: Accept
+                      value:
+                        values:
+                        - $type: ScriptedValue
+                        fixedValue:
+                          $type: StringTestValue
+                          value: application/json
+                protocol: 1
+                keepAlive1_1:
+                  bool: true
+            messageExchangePattern:
+              inverted: true
+          outputProviders:
+            requestHeader:
+              $type: HTTPNamedToolOutputProvider
+              menuName: Transport Header
+              name: Request Transport Header
+            responseHeader:
+              $type: HTTPNamedToolOutputProvider
+              menuName: Transport Header
+              name: Response Transport Header
+            xmlRequestOutput:
+              $type: NamedXMLToolOutputProvider
+              menuName: Traffic
+              name: Request Traffic
+            trafficOutput:
+              m_name: Traffic Stream
+            objectOutput:
+              $type: ObjectOutputProvider
+              outputTools:
+              - $type: TrafficViewer
+                iconName: TrafficViewer
+                name: Traffic Viewer
+                showRequestHeaders: true
+              name: Traffic Object
+          formXML:
+            doctype: ""
+          literal:
+            use: 1
+            text:
+              MessagingClient_LiteralMessage: ""
+              type: application/json
+            dataSource:
+              columnName: "Test 1: id[1]"
+          mode: Literal
+          literalQuery:
+            isPropertiesRef: true
+          literalPath:
+            pathElements:
+            - values:
+              - $type: ScriptedValue
+              fixedValue:
+                $type: StringTestValue
+                value: accounts
+            - values:
+              - $type: ScriptedValue
+              fixedValue:
+                $type: StringTestValue
+                value: "{accountId}"
+          constrainedPath:
+            pathParameters:
+            - $type: ElementValue
+              writeType: true
+              hasReference: true
+              qnameAsString: :accountId
+              replacedColumn: ""
+              values:
+              - $type: IntegerValue
+                hasMethod: true
+                replacedColumn: ""
+                mode: 3
+                columnName: "Dynamic Data 2-2-1: accountId"
+                value: 54321
+          resourceMethod:
+            resourceId: "/accounts/{accountId}"
+            httpMethod: GET
+          resourceMode: 3
+          baseUrl:
+            values:
+            - $type: ScriptedValue
+            - $type: WadlTestValue
+              value: https://parabank.parasoft.com/parabank/services/bank
+            fixedValue:
+              $type: StringTestValue
+              value: "${BASEURL}"
   - $type: TestSuite
     name: "Util: Reset Parabank Database"
     testID: 71
