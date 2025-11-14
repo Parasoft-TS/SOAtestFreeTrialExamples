@@ -8251,3 +8251,178 @@ suite:
           fixedValue:
             $type: StringTestValue
             value: "${BASEURL}"
+  - $type: TestSuite
+    name: "Util: Reset Parabank Database"
+    testID: 71
+    notes: Some of the operations performed by the Tests in this Test (.tst) File
+      alter the data of Parabank.  Running this Test Suite will re-initialize the
+      Parabank database back to its starting state.
+    tests:
+    - $type: RESTClientToolTest
+      name: /initializeDB - POST
+      testID: 72
+      performanceGroup: 16
+      tool:
+        $type: RESTClient
+        iconName: RESTClient
+        name: /initializeDB - POST
+        formJson:
+          value:
+            $type: ElementValue
+            writeType: true
+            hasReference: true
+            qnameAsString: :root
+            replacedColumn: ""
+            values:
+            - $type: ComplexValue
+              replacedColumn: ""
+              attributes:
+              - replacedColumn: ""
+                value:
+                  $type: StringValue
+                  replacedColumn: ""
+                  value: object
+                useValue: true
+              compositorValue: true
+              compositorValueObj:
+                replacedColumn: ""
+                values:
+                  $type: CompositorValueSetCollectionSet
+                  set:
+                  - $type: CompositorValueSet
+          elementTypeName: root
+        hasServiceInfo: true
+        serviceInfo:
+          serviceDescriptor:
+            $type: StandardServiceDescriptor
+            location: https://parabank.parasoft.com/parabank/services/bank/openapi.yaml
+          serviceName: ""
+          versionName: ""
+        jsonBuilder:
+          hasValue: true
+          value:
+            $type: JSONObjectValue
+            nameIsNull: true
+        schemaURL:
+          MessagingClient_SchemaLocation: "${OPENAPI}"
+        formInput:
+          value:
+            $type: ElementValue
+            writeType: true
+            hasReference: true
+            qnameAsString: ":"
+            replacedColumn: ""
+            values:
+            - $type: ComplexValue
+              replacedColumn: ""
+              compositorValue: true
+              compositorValueObj:
+                replacedColumn: ""
+                values:
+                  $type: CompositorValueSetCollectionSet
+                  set:
+                  - $type: CompositorValueSet
+        jmsMessageOutputProvider:
+          $type: JMSMessageOutputProvider
+          jmsOutputProviderRequest:
+            $type: JMSOutputProvider
+            name: Request Object
+            menuName: Object
+          jmsOutputProviderResponse:
+            $type: JMSOutputProvider
+            name: Response Message Object
+            menuName: Message Object
+        validResponseRange:
+          validResponseRange:
+            values:
+            - $type: ScriptedValue
+            fixedValue:
+              $type: StringTestValue
+              validResponseRange: 204
+        router:
+          values:
+          - $type: ScriptedValue
+          fixedValue:
+            $type: StringTestValue
+            HTTPClient_Endpoint: "${BASEURL}/initializeDB"
+        transportProperties:
+          manager:
+            protocol: 1
+            properties:
+            - $type: HTTPClientHTTPProperties
+              followRedirects:
+                bool: true
+              common:
+                method:
+                  values:
+                  - $type: ScriptedValue
+                  fixedValue:
+                    $type: HTTPMethodTestValue
+                    method: POST
+                httpHeaders:
+                  properties:
+                  - name: Accept
+                    value:
+                      values:
+                      - $type: ScriptedValue
+                      fixedValue:
+                        $type: StringTestValue
+                        value: application/json
+              protocol: 1
+              keepAlive1_1:
+                bool: true
+          messageExchangePattern:
+            inverted: true
+        outputProviders:
+          requestHeader:
+            $type: HTTPNamedToolOutputProvider
+            menuName: Transport Header
+            name: Request Transport Header
+          responseHeader:
+            $type: HTTPNamedToolOutputProvider
+            menuName: Transport Header
+            name: Response Transport Header
+          xmlRequestOutput:
+            $type: NamedXMLToolOutputProvider
+            menuName: Traffic
+            name: Request Traffic
+          trafficOutput:
+            m_name: Traffic Stream
+          objectOutput:
+            $type: ObjectOutputProvider
+            outputTools:
+            - $type: TrafficViewer
+              iconName: TrafficViewer
+              name: Traffic Viewer
+              showRequestHeaders: true
+              showResponseHeaders: true
+            name: Traffic Object
+        formXML:
+          doctype: ""
+        literal:
+          use: 1
+          text:
+            MessagingClient_LiteralMessage: ""
+            type: application/json
+        mode: Literal
+        literalQuery:
+          isPropertiesRef: true
+        literalPath:
+          pathElements:
+          - values:
+            - $type: ScriptedValue
+            fixedValue:
+              $type: StringTestValue
+              value: initializeDB
+        resourceMethod:
+          resourceId: /initializeDB
+          httpMethod: POST
+        resourceMode: 3
+        baseUrl:
+          values:
+          - $type: ScriptedValue
+          - $type: WadlTestValue
+            value: https://parabank.parasoft.com/parabank/services/bank
+          fixedValue:
+            $type: StringTestValue
+            value: "${BASEURL}"
